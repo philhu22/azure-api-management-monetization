@@ -1,0 +1,57 @@
+#
+# prepare the docker container for the billing app
+#
+# build the docker file and push to azurecr
+cd C:\Users\PhilippeHuet\az\azure-api-management-monetization\app
+docker build . -t tx-apim/stripeapp:latest
+
+# push to txapim.azurecr.io
+az login
+az acr login --name txapim
+docker tag 72e0 txapim.azurecr.io/stripeapp
+docker push txapim.azurecr.io/stripeapp
+
+# check
+docker pull txapim.azurecr.io/stripeapp
+
+# specify the container image location in output\main.json:
+
+"appServiceContainerImage": {
+      "type": "string",
+      "defaultValue": "txapim.azurecr.io/stripeapp:latest",
+      "metadata": {
+        "description": "The container image to deploy to the app service. By default is retrieved from Github"
+      }
+    },
+
+and in templates\main.bicep:
+
+@description('The container image to deploy to the app service. By default is retrieved from Github')
+param appServiceContainerImage string = 'txapim.azurecr.io/stripeapp:latest'
+
+#
+# Install
+#
+cd C:\Users\PhilippeHuet\az\azure-api-management-monetization
+pwsh -executionpolicy bypass -File tx-deploy.ps1
+
+!!! Installation of the docker image will fail because FTPS credentials must be specified.
+!!! Go to Deployment Center -> FTPS credentials and specify a valid password (TX@tx_....36)
+
+pwsh -executionpolicy bypass -File tx-stripInitialization.ps1
+
+#
+# run nodejs app locally
+#
+see https://github.com/microsoft/azure-api-management-monetization/blob/main/documentation/advanced-steps.md
+
+original delegation end point: https://txapimstripeservice.azurewebsites.net/apim-delegation
+new end point: xxxxx.ngrok.io/apim-delegation
+
+ngrok: 
+- get authtoken: ngrok authtoken xxxxx
+- fire up: ngrok http 8080
+
+run app:
+- npm run dev (full build)
+- node . (run only)
