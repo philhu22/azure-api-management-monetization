@@ -1,6 +1,6 @@
 import * as msRestNodeAuth from "@azure/ms-rest-nodeauth";
 import { ApiManagementClient } from "@azure/arm-apimanagement";
-import { ProductGetResponse, ProductListByServiceResponse, ReportRecordContract, SubscriptionCreateOrUpdateResponse, SubscriptionGetResponse, SubscriptionListResponse, SubscriptionState, UserCreateOrUpdateResponse, UserGetResponse, UserGetSharedAccessTokenResponse } from "@azure/arm-apimanagement/esm/models";
+import { ProductGetResponse, ProductListByServiceResponse, ReportRecordContract, SubscriptionCreateOrUpdateResponse, SubscriptionGetResponse, SubscriptionListResponse, SubscriptionState, UserCreateOrUpdateResponse, UserGetResponse, UserGetSharedAccessTokenResponse, UserListByServiceOptionalParams, UserListByServiceResponse } from "@azure/arm-apimanagement/esm/models";
 import { Utils } from "../utils";
 import fetch from "node-fetch";
 import { Guid } from 'js-guid';
@@ -40,6 +40,17 @@ export class ApimService {
         await this.initialize();
 
         return await this.managementClient.user.get(this.resourceGroupName, this.serviceName, userId);
+    }
+
+    /** Get a user by email */
+    public async getUserByEmail(userEmail: string): Promise<UserListByServiceResponse> {
+        await this.initialize();
+
+        const options: UserListByServiceOptionalParams = {
+            filter: "email eq '" + userEmail + "'"
+        };
+
+        return await this.managementClient.user.listByService(this.resourceGroupName, this.serviceName, options);
     }
 
     /** Get a subscription by ID */

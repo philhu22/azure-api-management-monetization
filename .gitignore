@@ -6,6 +6,7 @@
 # this project
 tx-deploy.ps1
 tx-stripeInitialization.ps1
+mySecrets.txt
 
 # User-specific files
 *.rsuser

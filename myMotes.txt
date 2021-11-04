@@ -1,4 +1,12 @@
 #
+# create the service principal 
+#
+az login
+az ad sp create-for-rbac --name Apim1StripeServicePrincipal --skip-assignment
+az ad sp show --id "http://Apim1StripeServicePrincipal"
+
+
+#
 # prepare the docker container for the billing app
 #
 # build the docker file and push to azurecr
@@ -38,6 +46,8 @@ pwsh -executionpolicy bypass -File tx-deploy.ps1
 !!! Installation of the docker image will fail because FTPS credentials must be specified.
 !!! Go to Deployment Center -> FTPS credentials and specify a valid password (TX@tx_....36)
 
+!!! Script does not set the configuration setting STRIPE_WEBHOOK_SECRET. Search the value on Stripe (Webhoos).
+
 pwsh -executionpolicy bypass -File tx-stripInitialization.ps1
 
 #
@@ -55,3 +65,12 @@ ngrok:
 run app:
 - npm run dev (full build)
 - node . (run only)
+
+
+# How To Use Okta for Azure API Management Developer Portal Authentication
+https://techcommunity.microsoft.com/t5/azure-architecture-blog/how-to-use-okta-for-azure-api-management-developer-portal/ba-p/1224754
+
+
+!!! Delegate product subscription doesn't work when authentication delegation is not enabled
+https://github.com/Azure/api-management-developer-portal/issues/1479
+
